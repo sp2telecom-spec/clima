@@ -2,40 +2,52 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<title>Overlay Clima + Hora</title>
+<title>Overlay Moderno</title>
 
 <style>
 body {
     margin: 0;
     background: transparent;
-    font-family: Arial, Helvetica, sans-serif;
-    color: white;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: #ffffff;
 }
 
+/* CONTAINER */
 .container {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 15px;
-    padding: 10px 15px;
-    backdrop-filter: blur(6px);
+    justify-content: center;
+    gap: 6px;
+    padding: 12px 18px;
+
+    /* efeito vidro moderno */
+    backdrop-filter: blur(10px);
 }
 
+/* HORA */
 .hora {
-    font-size: 36px;
-    font-weight: bold;
+    font-size: 48px;
+    font-weight: 600;
     letter-spacing: 2px;
+    text-shadow: 0 0 10px rgba(0,0,0,0.6);
 }
 
+/* CLIMA */
 .clima {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
-    font-size: 22px;
+
+    font-size: 20px;
+    opacity: 0.9;
 }
 
 .clima img {
-    width: 40px;
-    height: 40px;
+    width: 38px;
+    height: 38px;
+    filter: drop-shadow(0 0 4px rgba(0,0,0,0.6));
 }
 </style>
 
@@ -44,6 +56,7 @@ body {
 
 <div class="container">
     <div class="hora" id="hora">--:--</div>
+
     <div class="clima">
         <img id="icone" src="">
         <span id="temp">--°C</span>
@@ -61,16 +74,13 @@ function atualizarHora() {
 setInterval(atualizarHora, 1000);
 atualizarHora();
 
-// ===== CLIMA (Open-Meteo - sem API KEY) =====
+// ===== CLIMA (LEME - SP) =====
 async function carregarClima() {
     try {
-        // Leme - SP
         const lat = -22.18;
         const lon = -47.39;
 
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
-
-        const res = await fetch(url);
+        const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
         const data = await res.json();
 
         const temp = Math.round(data.current_weather.temperature);
@@ -78,15 +88,14 @@ async function carregarClima() {
 
         document.getElementById("temp").innerText = `${temp}°C`;
 
-        // Mapeamento simples de ícones
         let icon = "01d";
 
-        if ([0].includes(code)) icon = "01d"; // sol
-        else if ([1,2,3].includes(code)) icon = "02d"; // parcialmente nublado
-        else if ([45,48].includes(code)) icon = "50d"; // neblina
-        else if ([51,53,55,61,63,65].includes(code)) icon = "10d"; // chuva
-        else if ([71,73,75].includes(code)) icon = "13d"; // neve
-        else if ([95,96,99].includes(code)) icon = "11d"; // tempestade
+        if (code === 0) icon = "01d";
+        else if ([1,2,3].includes(code)) icon = "02d";
+        else if ([45,48].includes(code)) icon = "50d";
+        else if ([51,53,55,61,63,65].includes(code)) icon = "10d";
+        else if ([71,73,75].includes(code)) icon = "13d";
+        else if ([95,96,99].includes(code)) icon = "11d";
 
         document.getElementById("icone").src =
             `https://openweathermap.org/img/wn/${icon}@2x.png`;
@@ -97,7 +106,7 @@ async function carregarClima() {
 }
 
 carregarClima();
-setInterval(carregarClima, 600000); // atualiza a cada 10 min
+setInterval(carregarClima, 600000);
 </script>
 
 </body>
